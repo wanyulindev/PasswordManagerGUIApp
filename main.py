@@ -8,6 +8,9 @@ from tkinter import messagebox
 import random
 import string
 
+# import pyperclip to get rid of copy/paste hell work
+import pyperclip
+
 # FONT_NAME = "Arial"
 # EGGSHELL = "#FCE6C9"
 FONT_NAME= "Calibri"
@@ -20,7 +23,13 @@ def password_generator():
     characters = string.ascii_letters + string.digits + string.punctuation
     generated_password = "".join(random.choice(characters) for i in range(random.randint(6, 12)))
     # password_input.config(text=generated_password)
-    print(generated_password)
+    # print(generated_password)
+
+    password_input.delete(0, END)
+    password_input.insert(0, generated_password)
+    # simply using pyperclip function for copy/paste:
+    pyperclip.copy(generated_password)
+
 
 
 
@@ -40,19 +49,35 @@ def save_password():
     email_username_info= email_username_input.get()
     password_info = password_input.get()
 
-    # messagebox.
 
-    # using with open method will automatically close the file without close()
-    with open("MyPass.txt", "a") as file:
-        file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+    # (Have Validation): Show Warnings if user left some blanks
 
-    website_input.delete(0, END)
-    email_username_input.delete(0, END)
-    email_username_input.insert(0, "mypass@gmail.com")
-    password_input.delete(0, END)
+    # if not website_info or email_username_info or password_info:
+    #     messagebox.showwarning(title="You left some blanks!",
+    #                            message="Please filled up the blanks.")
 
+    # Always check what's my variable type, and write correct codes with it!
+    # ex: website_info is a str, so we are using len() here to validate the blanks:
+    if len(website_info) == 0 or len(email_username_info) == 0 or len(password_info) == 0:
+        messagebox.showwarning(title="You left some blanks!",
+                               message="Please filled up the blanks.")
 
+    else:
+        # set as boolean to let user choose whether save data or not:
+        # And see after messagebox.askokcancel, it returns as a bool!
+        # That's why we can assign it as an "is_true"!
+        is_true = messagebox.askokcancel(title="Almost done..",
+                                         message="Please double check with all the info, and hit 'OK'! ")
 
+        if is_true:
+            # using with open method will automatically close the file without close()
+            with open("MyPass.txt", "a") as file:
+                file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+
+            website_input.delete(0, END)
+            email_username_input.delete(0, END)
+            email_username_input.insert(0, "mypass@gmail.com")
+            password_input.delete(0, END)
 
 
 
