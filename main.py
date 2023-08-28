@@ -44,8 +44,16 @@ def save_password():
 
     # To fetch the current entry text, use the get method:
     # s = e.get()
+    website_info = website_input.get()
+    email_username_info = email_username_input.get()
+    password_info = password_input.get()
 
-
+    new_data = {
+        website_info: {
+            "email": email_username_info,
+            "password": password_info
+        }
+    }
 
     # (Have Validation): Show Warnings if user left some blanks
 
@@ -126,21 +134,42 @@ def save_password():
 
 def find_password():
 
+
+    # Fetch dictionary key & value VVV
+    # how to use parameter/variables as an engineer
+    # Global & Local scope of using parameter/variables
+    # How do I include all announced parameter/variables
+    # in main code or OOP
+
+    # try:
+    #     with open("MyPass.json", "r") as file:
+    #         data = json.load(file)
+    #         password_input = data[website_info]["password"]
+    #         email_username_input = data[website_info]["email"]
+    # except KeyError:
+    #     messagebox.showinfo(title="No Result!", message="No data file found.")
+    # else:
+    #     messagebox.showinfo(title="info", message=f"{}\n{}")
+
+    website_info = website_input.get()
     try:
-        with open("MyPass.json", "r") as file:
+        with open("MyPass.json") as file:
             data = json.load(file)
-            password_input = data[website_info]["password"]
-            email_username_input = data[website_info]["email"]
-    except KeyError:
-        messagebox.showinfo(title="No Result!", message="No data file found.")
+        # print(data)
+    except FileNotFoundError:
+        messagebox.showerror(title="No Result!", message="No data file found.")
     else:
-        messagebox.showinfo(title="info", message=f"{}\n{}")
-
-
-
-
-
-
+        if website_info in data:
+            email_info = data[website_info]["email"]
+            password_info = data[website_info]["password"]
+        # print(email_info)
+        # print(password_info)
+            messagebox.showinfo(title=website_info, message=f"email: {email_info}\n"
+                                                      f"password: {password_info}")
+            # pyperclip.copy(email_info)
+        #     if it's only one copy/paste we could use pyperclip again to save redundant job!
+        else:
+            messagebox.showinfo(title=f"{website_info} not found!", message=f"Insert the info and add it instead.")
 
 
 
@@ -180,19 +209,6 @@ password_input.grid(column=1, row=3)
 
 generate_password = Button(text="Generate Password", command=password_generator, width=12)
 generate_password.grid(column=2, row=3)
-
-
-website_info= website_input.get()
-email_username_info= email_username_input.get()
-password_info = password_input.get()
-
-new_data = {
-    website_info: {
-        "email": email_username_info,
-        "password": password_info
-    }
-}
-
 
 add = Button(text="Add", width=35, command=save_password)
 add.grid(column=1, row=4, columnspan=2)
