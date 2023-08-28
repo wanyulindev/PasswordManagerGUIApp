@@ -10,6 +10,7 @@ import string
 
 # import pyperclip to get rid of copy/paste hell work
 import pyperclip
+import json
 
 # FONT_NAME = "Arial"
 # EGGSHELL = "#FCE6C9"
@@ -31,8 +32,6 @@ def password_generator():
     pyperclip.copy(generated_password)
 
 
-
-
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
 def save_password():
@@ -45,9 +44,7 @@ def save_password():
 
     # To fetch the current entry text, use the get method:
     # s = e.get()
-    website_info= website_input.get()
-    email_username_info= email_username_input.get()
-    password_info = password_input.get()
+
 
 
     # (Have Validation): Show Warnings if user left some blanks
@@ -71,13 +68,79 @@ def save_password():
 
         if is_true:
             # using with open method will automatically close the file without close()
-            with open("MyPass.txt", "a") as file:
-                file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+            # with open("MyPass.txt", "a") as file:
+            #     file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+            #
+            # website_input.delete(0, END)
+            # email_username_input.delete(0, END)
+            # email_username_input.insert(0, "mypass@gmail.com")
+            # password_input.delete(0, END)
 
-            website_input.delete(0, END)
-            email_username_input.delete(0, END)
-            email_username_input.insert(0, "mypass@gmail.com")
-            password_input.delete(0, END)
+
+
+
+#             lets' built the data in .json:
+#             Writing data in .json:
+#             with open("MyPass.json", "w") as file:
+#                 # file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+#                 json.dump(new_data, file, indent=4)
+
+
+            #  Reading data in .json:
+            # with open("MyPass.json", "r") as file:
+            #     # file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+            #     data = json.load(file)
+            #     print(data)
+            #     print(type(data))
+            # #   Output: <class 'dict'>
+
+
+            # Updating data in .json:
+            # When we update data in .json, we always need to: (read --> update --> write)
+            try:
+                with open("MyPass.json", "r") as file:
+                    # file.write(f"\n\n{website_info}\n{email_username_info}\n{password_info}")
+                    data = json.load(file)
+
+                    # print(data)
+                    # print(type(data))
+                #   Output: <class 'dict'>
+
+            except FileNotFoundError:
+                with open("MyPass.json", "w") as file:
+                    json.dump(new_data, file, indent=4)
+
+            else:
+                data.update(new_data)
+                with open("MyPass.json", "w") as file:
+                    json.dump(data, file, indent=4)
+
+            finally:
+                website_input.delete(0, END)
+                email_username_input.delete(0, END)
+                email_username_input.insert(0, "mypass@gmail.com")
+                password_input.delete(0, END)
+
+
+# ------------------------- Find Password--------------------------------
+
+def find_password():
+
+    try:
+        with open("MyPass.json", "r") as file:
+            data = json.load(file)
+            password_input = data[website_info]["password"]
+            email_username_input = data[website_info]["email"]
+    except KeyError:
+        messagebox.showinfo(title="No Result!", message="No data file found.")
+    else:
+        messagebox.showinfo(title="info", message=f"{}\n{}")
+
+
+
+
+
+
 
 
 
@@ -97,29 +160,45 @@ canvas.grid(column=1, row=0)
 
 website = Label(text="Website: ", font=(FONT_NAME, 16), fg=FLORALWHITE)
 website.grid(column=0, row=1)
-website_input = Entry(width=35)
-website_input.grid(column=1, row=1, columnspan=2)
+website_input = Entry(width=20)
+website_input.grid(column=1, row=1)
 # put curser in the blank
 website_input.focus()
 
 email_username = Label(text="Email/Username: ", font=(FONT_NAME, 16), fg=FLORALWHITE)
 email_username.grid(column=0, row=2)
-email_username_input = Entry(width=35)
+email_username_input = Entry(width=37)
 email_username_input.grid(column=1, row=2, columnspan=2)
 # demo what to put / get rid of redundant work
 email_username_input.insert(0, "mypass@gmail.com")
 
 password = Label(text="Password: ", font=(FONT_NAME, 16), fg=FLORALWHITE)
 password.grid(column=0, row=3)
-password_input = Entry(width=18)
+password_input = Entry(width=21)
 password_input.grid(column=1, row=3)
 
 
-generate_password = Button(text="Generate Password", command=password_generator)
+generate_password = Button(text="Generate Password", command=password_generator, width=12)
 generate_password.grid(column=2, row=3)
 
-add= Button(text="Add", width=32, command=save_password)
+
+website_info= website_input.get()
+email_username_info= email_username_input.get()
+password_info = password_input.get()
+
+new_data = {
+    website_info: {
+        "email": email_username_info,
+        "password": password_info
+    }
+}
+
+
+add = Button(text="Add", width=35, command=save_password)
 add.grid(column=1, row=4, columnspan=2)
+
+search = Button(text="Search", width=12, command=find_password)
+search.grid(column=2, row=1)
 
 
 window.mainloop()
